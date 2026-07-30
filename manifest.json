@@ -7,7 +7,7 @@
       "name": "FS1",
       "description": "SupperStream movie and TV direct stream links",
       "version": "1.0.0",
-      "author": "Usama Mujahid",
+      "author": "Wareed",
       "supportedTypes": ["movie", "tv"],
       "filename": "providers/supperstream.js",
       "enabled": true,
