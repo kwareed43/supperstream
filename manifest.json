@@ -4,7 +4,7 @@
   "scrapers": [
     {
       "id": "supperstream",
-      "name": "FS1",
+      "name": "FS2",
       "description": "SupperStream movie and TV direct stream links",
       "version": "1.0.0",
       "author": "Wareed",
