@@ -1,26 +1,19 @@
-[
-  {
-    "id": "supperstream",
-    "name": "SupperStream",
-    "description": "Direct movie and TV streams from SupperStream-compatible player pages.",
-    "version": "1.0.0",
-    "author": "Wareed",
-    "supportedTypes": [
-      "movie",
-      "tv"
-    ],
-    "filename": "providers/supperstream.js",
-    "enabled": true,
-    "logo": "",
-    "contentLanguage": [
-      "en",
-      "hi"
-    ],
-    "formats": [
-      "m3u8"
-    ],
-    "limited": false,
-    "disabledPlatforms": [],
-    "supportsExternalPlayer": true
-  }
-]
+{
+  "name": "SupperStream Nuvio",
+  "version": "1.0.0",
+  "scrapers": [
+    {
+      "id": "supperstream",
+      "name": "FS1",
+      "description": "SupperStream movie and TV direct stream links",
+      "version": "1.0.0",
+      "author": "Usama Mujahid",
+      "supportedTypes": ["movie", "tv"],
+      "filename": "providers/supperstream.js",
+      "enabled": true,
+      "formats": ["m3u8"],
+      "logo": "",
+      "contentLanguage": ["en", "hi"]
+    }
+  ]
+}
