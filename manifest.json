@@ -1,0 +1,26 @@
+[
+  {
+    "id": "supperstream",
+    "name": "SupperStream",
+    "description": "Direct movie and TV streams from SupperStream-compatible player pages.",
+    "version": "1.0.0",
+    "author": "Usama Mujahid",
+    "supportedTypes": [
+      "movie",
+      "tv"
+    ],
+    "filename": "providers/supperstream.js",
+    "enabled": true,
+    "logo": "",
+    "contentLanguage": [
+      "en",
+      "hi"
+    ],
+    "formats": [
+      "m3u8"
+    ],
+    "limited": false,
+    "disabledPlatforms": [],
+    "supportsExternalPlayer": true
+  }
+]
