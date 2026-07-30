@@ -16,6 +16,9 @@ var PROVIDER_ID = "supperstream";
 var PROVIDER_NAME = "SupperStream";
 var PLAYER_ORIGIN = "https://laika422mon.com";
 
+// Apni TMDB v3 API key yahan paste karein.
+var TMDB_API_KEY = "439c478a771f35c05022f9feabcca01c";
+
 var HEADERS = {
   "User-Agent":
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
@@ -407,65 +410,101 @@ function matchesEpisode(fileObject, season, episode) {
 function resolveImdbId(tmdbId, mediaType) {
   var input = String(tmdbId || "").trim();
 
+  /*
+   * Testing ke liye agar IMDb ID already aaye to direct use karega.
+   */
   if (/^tt\d+$/i.test(input)) {
     return Promise.resolve(input.toLowerCase());
   }
 
   if (!/^\d+$/.test(input)) {
-    return Promise.reject(new Error("Invalid TMDB/IMDb id: " + input));
+    return Promise.reject(
+      new Error("Invalid TMDB ID: " + input)
+    );
   }
 
-  var tmdbType = mediaType === "tv" ? "tv" : "movie";
-  var tmdbUrl = "https://www.themoviedb.org/" + tmdbType + "/" + input;
+  if (
+    !TMDB_API_KEY ||
+    TMDB_API_KEY === "YOUR_TMDB_API_KEY"
+  ) {
+    return Promise.reject(
+      new Error(
+        "TMDB_API_KEY missing. providers/supperstream.js mein apni TMDB API key paste karein."
+      )
+    );
+  }
 
-  return fetchText(tmdbUrl, {
+  var type = mediaType === "tv" ? "tv" : "movie";
+
+  /*
+   * append_to_response=external_ids movie aur TV dono ke liye
+   * IMDb ID return karta hai.
+   */
+  var tmdbUrl =
+    "https://api.themoviedb.org/3/" +
+    type +
+    "/" +
+    encodeURIComponent(input) +
+    "?api_key=" +
+    encodeURIComponent(TMDB_API_KEY) +
+    "&append_to_response=external_ids";
+
+  return fetch(tmdbUrl, {
     method: "GET",
-    headers: HEADERS,
+    headers: {
+      "Accept": "application/json"
+    },
     redirect: "follow"
   })
-    .then(function (result) {
-      var patterns = [
-        /["']imdb_id["']\s*:\s*["'](tt\d+)["']/i,
-        /imdb_id\\?["']?\s*[:=]\s*\\?["'](tt\d+)/i,
-        /https?:\/\/(?:www\.)?imdb\.com\/title\/(tt\d+)/i
-      ];
-
-      for (var i = 0; i < patterns.length; i++) {
-        var match = result.text.match(patterns[i]);
-        if (match) return match[1].toLowerCase();
-      }
-
-      throw new Error("IMDb id not found in TMDB page");
-    })
-    .catch(function (firstError) {
-      var cinemetaUrl =
-        "https://v3-cinemeta.strem.io/meta/" +
-        (mediaType === "tv" ? "series" : "movie") +
-        "/tmdb:" + input + ".json";
-
-      return fetchText(cinemetaUrl, {
-        method: "GET",
-        headers: { "Accept": "application/json" },
-        redirect: "follow"
-      }).then(function (result) {
-        var data = JSON.parse(result.text);
-        var candidates = [
-          data && data.meta && data.meta.imdb_id,
-          data && data.meta && data.meta.imdbId,
-          data && data.meta && data.meta.id,
-          data && data.imdb_id,
-          data && data.imdbId
-        ];
-
-        for (var i = 0; i < candidates.length; i++) {
-          if (/^tt\d+$/i.test(String(candidates[i] || ""))) {
-            return String(candidates[i]).toLowerCase();
-          }
+    .then(function (response) {
+      return response.text().then(function (text) {
+        if (!response.ok) {
+          throw new Error(
+            "TMDB HTTP " +
+            response.status +
+            " | " +
+            text.slice(0, 200)
+          );
         }
 
-        throw new Error(
-          "IMDb mapping failed. TMDB error: " + firstError.message
+        var data;
+
+        try {
+          data = JSON.parse(text);
+        } catch (error) {
+          throw new Error(
+            "TMDB JSON parse error: " + error.message
+          );
+        }
+
+        /*
+         * Movie response mein imdb_id top level par aa sakti hai.
+         * TV response mein external_ids.imdb_id hoti hai.
+         */
+        var imdbId =
+          data.imdb_id ||
+          (
+            data.external_ids &&
+            data.external_ids.imdb_id
+          );
+
+        if (!/^tt\d+$/i.test(String(imdbId || ""))) {
+          throw new Error(
+            "IMDb ID not found for TMDB " +
+            type +
+            " ID " +
+            input
+          );
+        }
+
+        log(
+          "TMDB " +
+          input +
+          " converted to IMDb " +
+          imdbId
         );
+
+        return String(imdbId).toLowerCase();
       });
     });
 }
