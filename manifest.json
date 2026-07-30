@@ -4,7 +4,7 @@
     "name": "SupperStream",
     "description": "Direct movie and TV streams from SupperStream-compatible player pages.",
     "version": "1.0.0",
-    "author": "Usama Mujahid",
+    "author": "Wareed",
     "supportedTypes": [
       "movie",
       "tv"
