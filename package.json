@@ -1,0 +1,14 @@
+{
+  "name": "supperstream-nuvio-provider",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dependency-free SupperStream provider repository for Nuvio.",
+  "scripts": {
+    "test": "node tools/test.js",
+    "check": "node --check providers/supperstream.js && node tools/validate-manifest.js",
+    "serve": "npx --yes http-server . -p 3000 -c-1 --cors"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
